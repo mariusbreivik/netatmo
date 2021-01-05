@@ -43,11 +43,13 @@ var tempCmd = &cobra.Command{
 }
 
 func printOutdoorTemp(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Temperature outdoor:", chalk.Blue, stationData.Body.Devices[0].Modules[0].DashboardData.Temperature, chalk.Reset)
 
 }
 
 func printIndoorTemp(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Temperature indoor:", chalk.Red, stationData.Body.Devices[0].DashboardData.Temperature, chalk.Reset)
 }
 
