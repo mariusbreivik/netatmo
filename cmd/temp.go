@@ -1,58 +1,62 @@
-/*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package cmd
 
 import (
+	"fmt"
+	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/ttacon/chalk"
 )
 
-// tempCmd represents the temp command
+var indoor bool
+var outdoor bool
+
+// tempCmd is the command for retrieving temperature
 var tempCmd = &cobra.Command{
 	Use:     "temp",
 	Short:   "read temperature data from netatmo station",
 	Long:    `read temperature data from netatmo station`,
-	Example: "netatmo --temp indoor",
+	Example: "netatmo temp indoor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := netatmo.NewClient(netatmo.Config{
+		netatmoClient, err := netatmo.NewClient(netatmo.Config{
 			ClientID:     viper.GetString("netatmo.clientID"),
 			ClientSecret: viper.GetString("netatmo.clientSecret"),
 			Username:     viper.GetString("netatmo.username"),
 			Password:     viper.GetString("netatmo.password"),
 		})
 
-		//fmt.Println("client", client)
+		if err != nil {
+			return err
+		}
 
-		err = client.Read()
+		if indoor {
+			printIndoorTemp(netatmoClient.GetStationData())
+		} else if outdoor {
+			printOutdoorTemp(netatmoClient.GetStationData())
+		} else {
+			fmt.Println(cmd.UsageString())
+		}
 
-		return err
+		return nil
 	},
+}
+
+func printOutdoorTemp(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
+	fmt.Println("Temperature outdoor:", chalk.Blue, stationData.Body.Devices[0].Modules[0].DashboardData.Temperature, chalk.Reset)
+
+}
+
+func printIndoorTemp(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
+	fmt.Println("Temperature indoor:", chalk.Red, stationData.Body.Devices[0].DashboardData.Temperature, chalk.Reset)
 }
 
 func init() {
 	rootCmd.AddCommand(tempCmd)
 
-	// Here you will define your flags and configuration settings.
+	tempCmd.Flags().BoolVarP(&indoor, "indoor", "i", false, "netatmo temp -i|--indoor")
+	tempCmd.Flags().BoolVarP(&outdoor, "outdoor", "o", false, "netatmo temp -o|--outdoor")
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// tempCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// tempCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

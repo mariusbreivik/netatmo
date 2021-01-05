@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 
 	"github.com/mariusbreivik/netatmo/api/netatmo"
@@ -63,19 +62,16 @@ func (c *Client) doHTTP(req *http.Request) (*http.Response, error) {
 	return c.httpResponse, nil
 }
 
-// GetStations returns the list of stations owned by the user, and their modules
-func (c *Client) Read() error {
+// GetStationData returns data from netatmo api
+func (c *Client) GetStationData() netatmo.StationData {
 	resp, err := c.doHTTPGet(deviceURL, url.Values{"app_type": {"app_station"}})
-	//dc := &DeviceCollection{}
 
 	if err != nil {
 		fmt.Println(err)
 	}
-	if err = processHTTPResponse(resp, err); err != nil {
+	stationData := processHTTPResponse(resp, err)
 
-	}
-
-	return nil
+	return stationData
 }
 
 // send http GET request
@@ -92,30 +88,26 @@ func (c *Client) doHTTPGet(url string, data url.Values) (*http.Response, error) 
 }
 
 // process HTTP response
-// Unmarshall received data into holder struct
-func processHTTPResponse(resp *http.Response, err error) error {
+func processHTTPResponse(resp *http.Response, err error) netatmo.StationData {
 	defer resp.Body.Close()
 	if err != nil {
-		return err
+		fmt.Printf("An error occured %s", err)
 	}
 
 	// debug
-	debug, _ := httputil.DumpResponse(resp, true)
-	fmt.Printf("%s\n\n", debug)
+	//debug, _ := httputil.DumpResponse(resp, true)
+	//fmt.Printf("%s\n\n", debug)
 
 	// check http return code
 	if resp.StatusCode != 200 {
-		//bytes, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("Bad HTTP return code %d", resp.StatusCode)
+		fmt.Printf("Bad HTTP return code %d", resp.StatusCode)
 	}
 
 	var devices netatmo.StationData
-	// Unmarshall response into given struct
 	err = json.NewDecoder(resp.Body).Decode(&devices)
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(devices.Body.Devices[0].DashboardData.Temperature)
 
-	return nil
+	return devices
 }
