@@ -15,11 +15,11 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "netatmo",
-	Short: "read data from your personal netatmo weather station",
-	Long: `Uses the Netatmo Weatherstation API to get your indoor/outdoor 
-	temperature, co2 level, nois level, humidity, firmware data, wifi signal strength,
-	and more`,
-	Example: "netatmo --temp indoor",
+	Short: "read data from your personal netatmo weather station\n",
+	Long: "Uses the Netatmo Weatherstation API to get your indoor/outdoor\n" +
+		"temperature, co2 level, nois level, humidity, firmware data, wifi signal strength,\n" +
+		"and more",
+	Example: "netatmo temp --indoor",
 	RunE: func(cmd *cobra.Command, args []string) error {
 
 		return nil
