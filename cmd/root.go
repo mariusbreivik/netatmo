@@ -20,9 +20,8 @@ var rootCmd = &cobra.Command{
 		"temperature, co2 level, nois level, humidity, firmware data, wifi signal strength,\n" +
 		"and more",
 	Example: "netatmo temp --indoor",
-	RunE: func(cmd *cobra.Command, args []string) error {
-
-		return nil
+	Run: func(cmd *cobra.Command, args []string) {
+		cmd.Help()
 	},
 }
 
