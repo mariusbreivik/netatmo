@@ -45,7 +45,7 @@ netatmo:
 </br>
 
 ## 🧑‍💻 use()
-```netatmo```CLI serves multiple usages. 
+`netatmo` CLI serves multiple usages. 
 
  ### 🌡 temp
  ```shell
