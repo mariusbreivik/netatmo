@@ -17,6 +17,10 @@ package cmd
 
 import (
 	"fmt"
+	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
+	"github.com/mariusbreivik/netatmo/internal/netatmo"
+	"github.com/spf13/viper"
+	"github.com/ttacon/chalk"
 
 	"github.com/spf13/cobra"
 )
@@ -27,13 +31,46 @@ var humidityCmd = &cobra.Command{
 	Short:   "read humidity data from netatmo station",
 	Long:    `read humidity data from netatmo station`,
 	Example: "netatmo humidity",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("humidity called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		netatmoClient, err := netatmo.NewClient(netatmo.Config{
+			ClientID:     viper.GetString("netatmo.clientID"),
+			ClientSecret: viper.GetString("netatmo.clientSecret"),
+			Username:     viper.GetString("netatmo.username"),
+			Password:     viper.GetString("netatmo.password"),
+		})
+
+		if err != nil {
+			return err
+		}
+
+		if indoor {
+			printIndoorHumidity(netatmoClient.GetStationData())
+		} else if outdoor {
+			printOutdoorHumidity(netatmoClient.GetStationData())
+		} else {
+			fmt.Println(cmd.UsageString())
+		}
+
+		return nil
 	},
+}
+
+func printOutdoorHumidity(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
+	fmt.Println("Humidity outdoor:", chalk.Blue, stationData.Body.Devices[0].Modules[0].DashboardData.Humidity, chalk.Reset)
+
+}
+
+func printIndoorHumidity(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
+	fmt.Println("Humidity indoor:", chalk.Red, stationData.Body.Devices[0].DashboardData.Humidity, chalk.Reset)
 }
 
 func init() {
 	rootCmd.AddCommand(humidityCmd)
+
+	humidityCmd.Flags().BoolVarP(&indoor, "indoor", "i", false, "netatmo humidity -i|--indoor")
+	humidityCmd.Flags().BoolVarP(&outdoor, "outdoor", "o", false, "netatmo humidity -o|--outdoor")
 
 	// Here you will define your flags and configuration settings.
 
