@@ -18,7 +18,11 @@ package cmd
 import (
 	"fmt"
 
+	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
+	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/ttacon/chalk"
 )
 
 // noiseCmd represents the noise command
@@ -27,9 +31,30 @@ var noiseCmd = &cobra.Command{
 	Short:   "read noise data from netatmo station",
 	Long:    `read noise data from netatmo station`,
 	Example: "netatmo noise",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("noise called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		netatmoClient, err := netatmo.NewClient(netatmo.Config{
+			ClientID:     viper.GetString("netatmo.clientID"),
+			ClientSecret: viper.GetString("netatmo.clientSecret"),
+			Username:     viper.GetString("netatmo.username"),
+			Password:     viper.GetString("netatmo.password"),
+		})
+
+		if len(args) > 0 {
+			fmt.Println(cmd.UsageString())
+		}
+		if err != nil {
+			return err
+		}
+
+		printNoiseLevel(netatmoClient.GetStationData())
+		return nil
 	},
+}
+
+func printNoiseLevel(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
+	fmt.Println("Noise level:", chalk.Blue, stationData.Body.Devices[0].DashboardData.Noise, "dB", chalk.Reset)
+
 }
 
 func init() {
