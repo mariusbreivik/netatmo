@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+
 	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
@@ -44,7 +45,7 @@ var tempCmd = &cobra.Command{
 
 func printOutdoorTemp(stationData netatmo2.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Temperature outdoor:", chalk.Blue, stationData.Body.Devices[0].Modules[0].DashboardData.Temperature, chalk.Reset)
+	fmt.Println("Temperature outdoor:", chalk.Green, stationData.Body.Devices[0].Modules[0].DashboardData.Temperature, chalk.Reset)
 
 }
 

@@ -53,7 +53,7 @@ var noiseCmd = &cobra.Command{
 
 func printNoiseLevel(stationData netatmo2.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Noise level:", chalk.Blue, stationData.Body.Devices[0].DashboardData.Noise, "dB", chalk.Reset)
+	fmt.Println("Noise level:", chalk.Green, stationData.Body.Devices[0].DashboardData.Noise, "dB", chalk.Reset)
 
 }
 
