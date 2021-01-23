@@ -39,8 +39,6 @@ var noiseCmd = &cobra.Command{
 			Password:     viper.GetString("netatmo.password"),
 		})
 
-		fmt.Println(args)
-
 		if len(args) > 0 {
 			fmt.Println(cmd.UsageString())
 		}
