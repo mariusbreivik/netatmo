@@ -18,7 +18,11 @@ package cmd
 import (
 	"fmt"
 
+	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
+	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/ttacon/chalk"
 )
 
 // co2Cmd represents the co2 command
@@ -27,9 +31,32 @@ var co2Cmd = &cobra.Command{
 	Short:   "read co2 data from netatmo station",
 	Long:    `read co2 data from netatmo station`,
 	Example: "netatmo co2",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("co2 called")
+	RunE: func(cmd *cobra.Command, args []string) error {
+		netatmoClient, err := netatmo.NewClient(netatmo.Config{
+			ClientID:     viper.GetString("netatmo.clientID"),
+			ClientSecret: viper.GetString("netatmo.clientSecret"),
+			Username:     viper.GetString("netatmo.username"),
+			Password:     viper.GetString("netatmo.password"),
+		})
+
+		if err != nil {
+			return err
+		}
+
+		if len(args) > 0 {
+			fmt.Println(cmd.UsageString())
+		}
+
+		printCo2Level(netatmoClient.GetStationData())
+
+		return nil
 	},
+}
+
+func printCo2Level(stationData netatmo2.StationData) {
+	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
+	fmt.Println("Co2:", chalk.Green, stationData.Body.Devices[0].DashboardData.CO2, "ppm", chalk.Reset)
+
 }
 
 func init() {
