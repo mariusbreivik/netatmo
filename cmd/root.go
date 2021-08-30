@@ -17,7 +17,7 @@ var rootCmd = &cobra.Command{
 	Use:   "netatmo",
 	Short: "read data from your personal netatmo weather station\n",
 	Long: "Uses the Netatmo Weatherstation API to get your indoor/outdoor\n" +
-		"temperature, co2 level, nois level, humidity, firmware data, wifi signal strength,\n" +
+		"temperature, co2 level, pressure level, nois level, humidity, firmware data, wifi signal strength,\n" +
 		"and more",
 	Example: "netatmo temp --indoor",
 	Run: func(cmd *cobra.Command, args []string) {
