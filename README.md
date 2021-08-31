@@ -62,6 +62,8 @@ $ netatmo lastupgrade
  ### 📈 pressure
   ```shell
 $ netatmo pressure
+ ```
+
 
 </br>
 
