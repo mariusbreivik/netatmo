@@ -11,6 +11,7 @@
     - [⚙️ firmware](#️-firmware)
     - [📶 wifi](#-wifi)
     - [🕐 lastupgrade](#-lastupgrade)
+    - [📈 pressure](#-pressure)
   - [📜 develop()](#-develop)
   - [💾 install()](#-install)
 
@@ -57,6 +58,12 @@ $ netatmo wifi
   ```shell
 $ netatmo lastupgrade
  ```
+
+ ### 📈 pressure
+  ```shell
+$ netatmo pressure
+ ```
+
 
 </br>
 
@@ -105,6 +112,7 @@ Available Commands:
   noise       read noise data from netatmo station
   temp        read temperature data from netatmo station
   wifi        read wifi data from netatmo station
+  pressurs    read pressure data from netatmo station
 
 Flags:
       --config string   config file (default is $HOME/.netatmo.yaml)
