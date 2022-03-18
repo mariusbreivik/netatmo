@@ -112,7 +112,7 @@ Available Commands:
   noise       read noise data from netatmo station
   temp        read temperature data from netatmo station
   wifi        read wifi data from netatmo station
-  pressurs    read pressure data from netatmo station
+  pressure    read pressure data from netatmo station
 
 Flags:
       --config string   config file (default is $HOME/.netatmo.yaml)
