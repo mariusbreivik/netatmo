@@ -8,6 +8,8 @@
 netatmo
 # Test binary, built with `go test -c`
 *.test
+.Ds_Store
+target
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
