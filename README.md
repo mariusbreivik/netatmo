@@ -80,7 +80,7 @@ $ netatmo pressure
 ```shell
 $ go install && go build
 ```
-* create config file called `$HOME/.netatmo.yaml` with this content:
+* create a config file called `$HOME/.netatmo.yaml` with this content:
   
 ```yaml
 netatmo:
@@ -89,7 +89,7 @@ netatmo:
   username: YOUR_NETATMO_USERNAME
   password: YOUR_NETATMO_PASSWORD
 ```
-* If everything is correct should be able to run:
+* If everything is correct you should be able to run:
 ```
 $ netatmo
 
