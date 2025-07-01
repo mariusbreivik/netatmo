@@ -5,7 +5,9 @@ permissions:
   packages: write
 
 on:
-  create:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   release:
