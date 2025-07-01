@@ -3,12 +3,15 @@ permissions:
   contents: read
   packages: write
 on:
-  push:
-    tags:
-      - 'v*.*.*'
+  workflow_run:
+    workflows:
+      - Build and Tag
+    types:
+      - completed
 
 jobs:
   release:
+    if: startsWith(github.event.workflow_run.head_commit.message, 'v')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
