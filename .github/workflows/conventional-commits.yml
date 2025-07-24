@@ -2,6 +2,7 @@ name: "Check Conventional Commits"
 
 permissions:
   contents: read
+  pull-requests: write
 
 on:
   push:
