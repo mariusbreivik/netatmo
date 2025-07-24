@@ -1,0 +1,19 @@
+name: "Check Conventional Commits"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check-conventional-commits:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: mariusbreivik/conventional-commits-suggester@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          suggestion_mode: "summary"    # "summary", "comment", or "both"
+          fail_on_error: "true"         # set "false" to just warn and not fail
+          allowed_types: "feat,fix,chore,docs,refactor,test,ci,build,perf"
