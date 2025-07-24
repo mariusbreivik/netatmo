@@ -15,7 +15,7 @@
   - [📜 develop()](#-develop)
   - [💾 install()](#-install)
 
-## 📖 describe()
+## 📖 describe() 
 `netatmo` is a tiny CLI based on the [cobra](https://github.com/spf13/cobra)
  framework written in [go-lang](https://golang.org/). Its mostly just for fun, but the purpose is retrieving and displaying data in the command line from netatmo weather api.
 
