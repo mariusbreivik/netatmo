@@ -12,8 +12,6 @@
 
 `netatmo` is a lightweight CLI tool built with [Cobra](https://github.com/spf13/cobra) and [Go](https://golang.org/) that lets you fetch data from your [Netatmo Weather Station](https://www.netatmo.com/en-eu/weather/weatherstation) right in your terminal.
 
-No more opening apps. No more browser tabs. Just pure, unadulterated weather data at your fingertips. ⌨️
-
 ---
 
 ## ✨ Features
@@ -87,7 +85,7 @@ netatmo login --access-token YOUR_TOKEN --refresh-token YOUR_REFRESH
 
 ## 🧑‍💻 Usage
 
-### ℹ️ Status (Full Dashboard)
+### ℹ️ Status
 ```shell
 netatmo status
 ```
@@ -99,14 +97,14 @@ Example output:
 
   📍 Indoor (Indoor)
   ─────────────────────────────────
-  🌡️  Temperature    22.5°C →
+  🌡️ Temperature    22.5°C →
   💧 Humidity       45%
-  🌫️  CO2            892 ppm
+  🌫️ CO2            892 ppm
   🔊 Noise          42 dB
 
   🌳 Outdoor (Outdoor)
   ─────────────────────────────────
-  🌡️  Temperature    8.3°C ↓
+  🌡️ Temperature    8.3°C ↓
   💧 Humidity       67%
   🔋 Battery        87% 🔋
 
@@ -114,7 +112,7 @@ Example output:
   ─────────────────────────────────
   🌀 Pressure       1013.2 hPa →
   📶 WiFi           Good 📶
-  ⚙️  Firmware       181
+  ⚙️ Firmware       181
 
   ⏱️  Last updated: 2 minutes ago
 ```
@@ -213,12 +211,6 @@ go build -o netatmo .
 # Run
 ./netatmo --help
 ```
-
----
-
-## 📄 License
-
-[Apache License 2.0](LICENSE)
 
 ---
 
