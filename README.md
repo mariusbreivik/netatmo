@@ -12,11 +12,13 @@
 
 `netatmo` is a lightweight CLI tool built with [Cobra](https://github.com/spf13/cobra) and [Go](https://golang.org/) that lets you fetch data from your [Netatmo Weather Station](https://www.netatmo.com/en-eu/weather/weatherstation) right in your terminal.
 
+No more opening apps. No more browser tabs. Just pure, unadulterated weather data at your fingertips. ⌨️
 
 ---
 
 ## ✨ Features
 
+- 📊 **Status** — Full dashboard with all readings at once
 - 🌡️ **Temperature** — Indoor and outdoor readings
 - 💧 **Humidity** — Indoor and outdoor levels
 - 🌫️ **CO2** — Carbon dioxide concentration
@@ -85,7 +87,39 @@ netatmo login --access-token YOUR_TOKEN --refresh-token YOUR_REFRESH
 
 ## 🧑‍💻 Usage
 
-### 🌡️Temperature
+### ℹ️ Status (Full Dashboard)
+```shell
+netatmo status
+```
+
+Example output:
+```
+🏠 Living Room Station
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  📍 Indoor (Indoor)
+  ─────────────────────────────────
+  🌡️  Temperature    22.5°C →
+  💧 Humidity       45%
+  🌫️  CO2            892 ppm
+  🔊 Noise          42 dB
+
+  🌳 Outdoor (Outdoor)
+  ─────────────────────────────────
+  🌡️  Temperature    8.3°C ↓
+  💧 Humidity       67%
+  🔋 Battery        87% 🔋
+
+  📊 System
+  ─────────────────────────────────
+  🌀 Pressure       1013.2 hPa →
+  📶 WiFi           Good 📶
+  ⚙️  Firmware       181
+
+  ⏱️  Last updated: 2 minutes ago
+```
+
+### 🌡 Temperature
 ```shell
 # Indoor temperature
 netatmo temp --indoor
@@ -120,7 +154,7 @@ netatmo pressure
 ```
 > 📊 Atmospheric pressure for weather nerds.
 
-### Shell Completion
+### 🐚 Shell Completion
 ```shell
 # Bash
 netatmo completion bash > /etc/bash_completion.d/netatmo
@@ -150,6 +184,7 @@ Available Commands:
   login       Store Netatmo API tokens for authentication
   noise       Read noise data from netatmo station
   pressure    Read pressure data from netatmo station
+  status      Display a full dashboard of your weather station
   temp        Read temperature data from netatmo station
   wifi        Read wifi data from netatmo station
 
