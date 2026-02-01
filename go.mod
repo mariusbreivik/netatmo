@@ -1,6 +1,6 @@
 module github.com/mariusbreivik/netatmo
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.1
 
@@ -9,7 +9,7 @@ require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.21.0
 	github.com/ttacon/chalk v0.0.0-20160626202418-22c06c80ed31
-	golang.org/x/oauth2 v0.30.0
+	golang.org/x/oauth2 v0.34.0
 )
 
 require (
