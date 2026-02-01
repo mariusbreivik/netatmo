@@ -5,7 +5,7 @@
 *.so
 *.dylib
 .idea
-netatmo
+/netatmo
 # Test binary, built with `go test -c`
 *.test
 .Ds_Store
