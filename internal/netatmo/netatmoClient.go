@@ -1,6 +1,7 @@
 package netatmo
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,17 +12,15 @@ import (
 )
 
 const (
-	baseURL   = "https://api.netatmo.net/"
-	authURL   = baseURL + "oauth2/token"
-	deviceURL = baseURL + "/api/getstationsdata"
+	baseURL   = "https://api.netatmo.com/"
+	tokenURL  = baseURL + "oauth2/token"
+	deviceURL = baseURL + "api/getstationsdata"
 )
 
 // Config used to create a netatmo client
 type Config struct {
 	ClientID     string
 	ClientSecret string
-	Username     string
-	Password     string
 }
 
 // Client use to make request to Netatmo API
@@ -31,24 +30,58 @@ type Client struct {
 	httpResponse *http.Response
 }
 
-// NewClient create a handle authentication to Netamo API
+// NewClient creates a handle for authentication to Netatmo API using stored OAuth2 tokens
 func NewClient(config Config) (*Client, error) {
-	oauth := &oauth2.Config{
+	ctx := context.Background()
+
+	oauthConfig := &oauth2.Config{
 		ClientID:     config.ClientID,
 		ClientSecret: config.ClientSecret,
 		Scopes:       []string{"read_station"},
 		Endpoint: oauth2.Endpoint{
-			AuthURL:  baseURL,
-			TokenURL: authURL,
+			TokenURL: tokenURL,
 		},
 	}
 
-	token, err := oauth.PasswordCredentialsToken(oauth2.NoContext, config.Username, config.Password)
+	// Check if token exists
+	if !tokenExists() {
+		return nil, fmt.Errorf("not authenticated. Please run 'netatmo login' first")
+	}
 
-	return &Client{
-		oauth:      oauth,
-		httpClient: oauth.Client(oauth2.NoContext, token),
-	}, err
+	// Load existing token
+	token, err := loadToken()
+	if err != nil {
+		return nil, fmt.Errorf("failed to load token: %w. Please run 'netatmo login' again", err)
+	}
+
+	// Token is valid, use it directly
+	if token.Valid() {
+		return &Client{
+			oauth:      oauthConfig,
+			httpClient: oauthConfig.Client(ctx, token),
+		}, nil
+	}
+
+	// Token expired but we have a refresh token - try to refresh
+	if token.RefreshToken != "" {
+		tokenSource := oauthConfig.TokenSource(ctx, token)
+		newToken, err := tokenSource.Token()
+		if err != nil {
+			return nil, fmt.Errorf("token refresh failed: %w. Please run 'netatmo login' again", err)
+		}
+
+		// Save the refreshed token
+		if saveErr := saveToken(newToken); saveErr != nil {
+			fmt.Printf("Warning: could not save refreshed token: %v\n", saveErr)
+		}
+
+		return &Client{
+			oauth:      oauthConfig,
+			httpClient: oauthConfig.Client(ctx, newToken),
+		}, nil
+	}
+
+	return nil, fmt.Errorf("token expired and no refresh token available. Please run 'netatmo login' again")
 }
 
 // do a generic HTTP request

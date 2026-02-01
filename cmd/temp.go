@@ -23,8 +23,6 @@ var tempCmd = &cobra.Command{
 		netatmoClient, err := netatmo.NewClient(netatmo.Config{
 			ClientID:     viper.GetString("netatmo.clientID"),
 			ClientSecret: viper.GetString("netatmo.clientSecret"),
-			Username:     viper.GetString("netatmo.username"),
-			Password:     viper.GetString("netatmo.password"),
 		})
 
 		if err != nil {

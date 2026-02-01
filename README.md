@@ -86,9 +86,30 @@ $ go install && go build
 netatmo:
   clientID: YOUR_CLIENT_ID
   clientSecret: YOUR_CLIENT_SECRET
-  username: YOUR_NETATMO_USERNAME
-  password: YOUR_NETATMO_PASSWORD
 ```
+
+### 🔐 Authentication
+
+This CLI uses OAuth2 tokens for authentication. You need to get your tokens from the Netatmo developer portal:
+
+1. Go to https://dev.netatmo.com/apps/
+2. Select your app
+3. Scroll down to "Token generator"
+4. Select scope `read_station` and click "Generate Token"
+5. Copy the access token and refresh token
+
+Then run the login command:
+
+```shell
+# Interactive mode (prompts for tokens)
+$ netatmo login
+
+# Or non-interactive mode
+$ netatmo login --access-token YOUR_ACCESS_TOKEN --refresh-token YOUR_REFRESH_TOKEN
+```
+
+The tokens are stored in `~/.netatmo-token.json` and will be automatically refreshed when expired.
+
 * If everything is correct you should be able to run:
 ```
 $ netatmo
