@@ -38,9 +38,9 @@ var statusCmd = &cobra.Command{
 		// Indoor section
 		fmt.Printf("  %s📍 Indoor (%s)%s\n", chalk.Bold, device.ModuleName, chalk.Reset)
 		fmt.Println("  ─────────────────────────────────")
-		fmt.Printf("  🌡️  Temperature    %s %s\n", netatmo.FormatTemperature(dashboard.Temperature), netatmo.FormatTrend(dashboard.TempTrend))
+		fmt.Printf("  🌡️ Temperature    %s %s\n", netatmo.FormatTemperature(dashboard.Temperature), netatmo.FormatTrend(dashboard.TempTrend))
 		fmt.Printf("  💧 Humidity       %s\n", netatmo.FormatHumidity(dashboard.Humidity))
-		fmt.Printf("  🌫️  CO2            %s\n", netatmo.FormatCO2(dashboard.CO2))
+		fmt.Printf("  🌫️ CO2            %s\n", netatmo.FormatCO2(dashboard.CO2))
 		fmt.Printf("  🔊 Noise          %s\n", netatmo.FormatNoise(dashboard.Noise))
 		fmt.Println()
 
@@ -59,7 +59,7 @@ var statusCmd = &cobra.Command{
 				if hasTemp {
 					fmt.Printf("  %s🌳 Outdoor (%s)%s\n", chalk.Bold, module.ModuleName, chalk.Reset)
 					fmt.Println("  ─────────────────────────────────")
-					fmt.Printf("  🌡️  Temperature    %s %s\n", netatmo.FormatTemperature(module.DashboardData.Temperature), netatmo.FormatTrend(module.DashboardData.TempTrend))
+					fmt.Printf("  🌡️ Temperature    %s %s\n", netatmo.FormatTemperature(module.DashboardData.Temperature), netatmo.FormatTrend(module.DashboardData.TempTrend))
 					fmt.Printf("  💧 Humidity       %s\n", netatmo.FormatHumidity(module.DashboardData.Humidity))
 					fmt.Printf("  🔋 Battery        %s\n", netatmo.FormatBattery(module.BatteryPercent))
 					fmt.Println()
@@ -72,7 +72,7 @@ var statusCmd = &cobra.Command{
 		fmt.Println("  ─────────────────────────────────")
 		fmt.Printf("  🌀 Pressure       %.1f hPa %s\n", dashboard.Pressure, netatmo.FormatTrend(dashboard.PressureTrend))
 		fmt.Printf("  📶 WiFi           %s\n", netatmo.FormatWifiSignal(device.WifiStatus))
-		fmt.Printf("  ⚙️  Firmware       %d\n", device.Firmware)
+		fmt.Printf("  ⚙️ Firmware       %d\n", device.Firmware)
 		fmt.Println()
 
 		// Last updated
