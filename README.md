@@ -1,6 +1,6 @@
-x# 🌤️ netatmo
+# 🌤️ netatmo
 
-> Your weather station, your terminal. Because sometimes you just need to know the CO2 level without opening an app.
+> Your weather station in your terminal. Because sometimes you just need to know the CO2 level without opening an app.
 
 [![Build](https://github.com/mariusbreivik/netatmo/actions/workflows/build.yml/badge.svg)](https://github.com/mariusbreivik/netatmo/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mariusbreivik/netatmo)](https://goreportcard.com/report/github.com/mariusbreivik/netatmo)
@@ -87,7 +87,7 @@ netatmo login --access-token YOUR_TOKEN --refresh-token YOUR_REFRESH
 
 ## 🧑‍💻 Usage
 
-### Status (Full Dashboard)
+### ℹ️ Status (Full Dashboard)
 ```shell
 netatmo status
 ```
@@ -119,7 +119,7 @@ Example output:
   ⏱️  Last updated: 2 minutes ago
 ```
 
-### Temperature
+### 🌡 Temperature
 ```shell
 # Indoor temperature
 netatmo temp --indoor
@@ -130,31 +130,31 @@ netatmo temp --outdoor
 netatmo temp -o
 ```
 
-### Humidity
+### 💧 Humidity
 ```shell
 netatmo humidity --indoor   # or -i
 netatmo humidity --outdoor  # or -o
 ```
 
-### CO2 Level
+### 🌫 CO2 Level
 ```shell
 netatmo co2
 ```
 > 🌿 Keep it under 1000 ppm for a happy brain!
 
-### Noise Level
+### 🔊 Noise Level
 ```shell
 netatmo noise
 ```
 > 🔇 Measured in decibels. Library quiet? Or rock concert?
 
-### Pressure
+### 🌀 Pressure
 ```shell
 netatmo pressure
 ```
 > 📊 Atmospheric pressure for weather nerds.
 
-### Shell Completion
+### 🐚 Shell Completion
 ```shell
 # Bash
 netatmo completion bash > /etc/bash_completion.d/netatmo
