@@ -17,12 +17,11 @@ package cmd
 
 import (
 	"fmt"
+
 	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/mariusbreivik/netatmo/internal/netatmo"
-	"github.com/spf13/viper"
-	"github.com/ttacon/chalk"
-
 	"github.com/spf13/cobra"
+	"github.com/ttacon/chalk"
 )
 
 // humidityCmd represents the humidity command
@@ -32,10 +31,7 @@ var humidityCmd = &cobra.Command{
 	Long:    `read humidity data from netatmo station`,
 	Example: "netatmo humidity",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient(netatmo.Config{
-			ClientID:     viper.GetString("netatmo.clientID"),
-			ClientSecret: viper.GetString("netatmo.clientSecret"),
-		})
+		netatmoClient, err := netatmo.NewClient()
 
 		if err != nil {
 			return err

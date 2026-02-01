@@ -17,12 +17,6 @@ const (
 	deviceURL = baseURL + "api/getstationsdata"
 )
 
-// Config used to create a netatmo client
-type Config struct {
-	ClientID     string
-	ClientSecret string
-}
-
 // Client use to make request to Netatmo API
 type Client struct {
 	oauth        *oauth2.Config
@@ -30,9 +24,25 @@ type Client struct {
 	httpResponse *http.Response
 }
 
-// NewClient creates a handle for authentication to Netatmo API using stored OAuth2 tokens
-func NewClient(config Config) (*Client, error) {
+// NewClient creates a handle for authentication to Netatmo API using stored config
+func NewClient() (*Client, error) {
 	ctx := context.Background()
+
+	// Load config
+	config, err := LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	// Validate credentials
+	if !config.HasCredentials() {
+		return nil, fmt.Errorf("credentials not configured. Please run 'netatmo configure' first")
+	}
+
+	// Validate tokens
+	if !config.HasTokens() {
+		return nil, fmt.Errorf("not authenticated. Please run 'netatmo login' first")
+	}
 
 	oauthConfig := &oauth2.Config{
 		ClientID:     config.ClientID,
@@ -43,15 +53,14 @@ func NewClient(config Config) (*Client, error) {
 		},
 	}
 
-	// Check if token exists
-	if !tokenExists() {
-		return nil, fmt.Errorf("not authenticated. Please run 'netatmo login' first")
-	}
-
-	// Load existing token
+	// Load token
 	token, err := loadToken()
 	if err != nil {
 		return nil, fmt.Errorf("failed to load token: %w. Please run 'netatmo login' again", err)
+	}
+
+	if token == nil {
+		return nil, fmt.Errorf("not authenticated. Please run 'netatmo login' first")
 	}
 
 	// Token is valid, use it directly

@@ -31,6 +31,12 @@ You can get these tokens from the Netatmo developer portal:
   # Non-interactive mode (for scripting)
   netatmo login --access-token YOUR_ACCESS_TOKEN --refresh-token YOUR_REFRESH_TOKEN`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		// Check if credentials are configured
+		config, err := netatmo.LoadConfig()
+		if err != nil || !config.HasCredentials() {
+			return fmt.Errorf("credentials not configured. Please run 'netatmo configure' first")
+		}
+
 		// If tokens not provided via flags, prompt interactively
 		if accessToken == "" {
 			fmt.Print("Enter access token: ")
@@ -65,9 +71,9 @@ You can get these tokens from the Netatmo developer portal:
 			return fmt.Errorf("failed to save tokens: %w", err)
 		}
 
-		tokenPath, _ := netatmo.GetTokenPath()
+		configPath, _ := netatmo.GetConfigPath()
 		fmt.Println("✓ Tokens saved successfully!")
-		fmt.Printf("  Token file: %s\n", tokenPath)
+		fmt.Printf("  Config file: %s\n", configPath)
 		fmt.Println("\nYou can now use netatmo commands like 'netatmo temp --indoor'")
 
 		return nil
