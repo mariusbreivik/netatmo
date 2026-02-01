@@ -80,15 +80,47 @@ $ netatmo pressure
 ```shell
 $ go install && go build
 ```
-* create a config file called `$HOME/.netatmo.yaml` with this content:
-  
-```yaml
-netatmo:
-  clientID: YOUR_CLIENT_ID
-  clientSecret: YOUR_CLIENT_SECRET
-  username: YOUR_NETATMO_USERNAME
-  password: YOUR_NETATMO_PASSWORD
+
+### ⚙️ Configuration
+
+All configuration is stored in a single file: `~/.netatmo-config.json`
+
+#### Step 1: Configure API credentials
+
+Get your credentials from the Netatmo developer portal:
+1. Go to https://dev.netatmo.com/apps/
+2. Create a new app or select an existing one
+3. Copy the client ID and client secret
+
+Then run:
+```shell
+# Interactive mode
+$ netatmo configure
+
+# Or non-interactive mode
+$ netatmo configure --client-id YOUR_CLIENT_ID --client-secret YOUR_CLIENT_SECRET
 ```
+
+#### Step 2: Authenticate with tokens
+
+Get your tokens from the Netatmo developer portal:
+1. Go to https://dev.netatmo.com/apps/
+2. Select your app
+3. Scroll down to "Token generator"
+4. Select scope `read_station` and click "Generate Token"
+5. Copy the access token and refresh token
+
+Then run:
+```shell
+# Interactive mode
+$ netatmo login
+
+# Or non-interactive mode
+$ netatmo login --access-token YOUR_ACCESS_TOKEN --refresh-token YOUR_REFRESH_TOKEN
+```
+
+The tokens will be automatically refreshed when expired.
+
 * If everything is correct you should be able to run:
 ```
 $ netatmo
@@ -106,18 +138,19 @@ netatmo temp --indoor
 
 Available Commands:
   co2         read co2 data from netatmo station
+  configure   Configure Netatmo API credentials
   firmware    read firmware data from netatmo station
   help        Help about any command
   humidity    read humidity data from netatmo station
+  login       Store Netatmo API tokens for authentication
   noise       read noise data from netatmo station
   temp        read temperature data from netatmo station
   wifi        read wifi data from netatmo station
   pressure    read pressure data from netatmo station
 
 Flags:
-      --config string   config file (default is $HOME/.netatmo.yaml)
-  -d, --debug           debug logging
-  -h, --help            help for netatmo
+  -d, --debug   debug logging
+  -h, --help    help for netatmo
 
 Use "netatmo [command] --help" for more information about a command.
 ```

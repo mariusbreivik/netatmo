@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,6 @@ import (
 	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/ttacon/chalk"
 )
 
@@ -33,12 +32,7 @@ var pressureCmd = &cobra.Command{
 	Long:    `read pressure data from netatmo station`,
 	Example: "netatmo pressure",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient(netatmo.Config{
-			ClientID:     viper.GetString("netatmo.clientID"),
-			ClientSecret: viper.GetString("netatmo.clientSecret"),
-			Username:     viper.GetString("netatmo.username"),
-			Password:     viper.GetString("netatmo.password"),
-		})
+		netatmoClient, err := netatmo.NewClient()
 
 		if err != nil {
 			return err
@@ -56,7 +50,7 @@ var pressureCmd = &cobra.Command{
 
 func printPressureLevel(stationData netatmo2.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Pressure:", chalk.Green, math.Round(stationData.Body.Devices[0].DashboardData.AbsolutePressure / 1000 * 760), "mm", chalk.Reset)
+	fmt.Println("Pressure:", chalk.Green, math.Round(stationData.Body.Devices[0].DashboardData.AbsolutePressure/1000*760), "mm", chalk.Reset)
 
 }
 
