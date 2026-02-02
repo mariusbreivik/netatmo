@@ -4,8 +4,23 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
 )
+
+var sharedClient *netatmo.Client
+
+func getClient() (*netatmo.Client, error) {
+	if sharedClient != nil {
+		return sharedClient, nil
+	}
+	client, err := netatmo.NewClient()
+	if err != nil {
+		return nil, err
+	}
+	sharedClient = client
+	return sharedClient, nil
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -16,7 +31,7 @@ var rootCmd = &cobra.Command{
 		"and more",
 	Example: "netatmo temp --indoor",
 	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Help()
+		_ = cmd.Help()
 	},
 }
 
