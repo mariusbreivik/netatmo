@@ -18,8 +18,7 @@ package cmd
 import (
 	"fmt"
 
-	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
+	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
 )
@@ -31,7 +30,7 @@ var humidityCmd = &cobra.Command{
 	Long:    `read humidity data from netatmo station`,
 	Example: "netatmo humidity",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient()
+		netatmoClient, err := getClient()
 
 		if err != nil {
 			return err
@@ -49,13 +48,13 @@ var humidityCmd = &cobra.Command{
 	},
 }
 
-func printOutdoorHumidity(stationData netatmo2.StationData) {
+func printOutdoorHumidity(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Humidity outdoor:", chalk.Blue, stationData.Body.Devices[0].Modules[0].DashboardData.Humidity, chalk.Reset)
 
 }
 
-func printIndoorHumidity(stationData netatmo2.StationData) {
+func printIndoorHumidity(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Humidity indoor:", chalk.Red, stationData.Body.Devices[0].DashboardData.Humidity, chalk.Reset)
 }

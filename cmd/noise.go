@@ -18,8 +18,7 @@ package cmd
 import (
 	"fmt"
 
-	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
+	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
 )
@@ -31,7 +30,7 @@ var noiseCmd = &cobra.Command{
 	Long:    `read noise data from netatmo station`,
 	Example: "netatmo noise",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient()
+		netatmoClient, err := getClient()
 
 		if len(args) > 0 {
 			fmt.Println(cmd.UsageString())
@@ -45,7 +44,7 @@ var noiseCmd = &cobra.Command{
 	},
 }
 
-func printNoiseLevel(stationData netatmo2.StationData) {
+func printNoiseLevel(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Noise level:", chalk.Green, stationData.Body.Devices[0].DashboardData.Noise, "dB", chalk.Reset)
 

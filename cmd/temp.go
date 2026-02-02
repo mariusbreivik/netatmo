@@ -3,8 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
+	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
 )
@@ -19,7 +18,7 @@ var tempCmd = &cobra.Command{
 	Long:    `read temperature data from netatmo station`,
 	Example: "netatmo temp indoor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient()
+		netatmoClient, err := getClient()
 
 		if err != nil {
 			return err
@@ -37,13 +36,13 @@ var tempCmd = &cobra.Command{
 	},
 }
 
-func printOutdoorTemp(stationData netatmo2.StationData) {
+func printOutdoorTemp(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Temperature outdoor:", chalk.Green, stationData.Body.Devices[0].Modules[0].DashboardData.Temperature, chalk.Reset)
 
 }
 
-func printIndoorTemp(stationData netatmo2.StationData) {
+func printIndoorTemp(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Temperature indoor:", chalk.Red, stationData.Body.Devices[0].DashboardData.Temperature, chalk.Reset)
 }

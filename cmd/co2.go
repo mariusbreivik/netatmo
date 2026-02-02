@@ -18,8 +18,7 @@ package cmd
 import (
 	"fmt"
 
-	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
+	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
 )
@@ -31,7 +30,7 @@ var co2Cmd = &cobra.Command{
 	Long:    `read co2 data from netatmo station`,
 	Example: "netatmo co2",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient()
+		netatmoClient, err := getClient()
 
 		if err != nil {
 			return err
@@ -47,7 +46,7 @@ var co2Cmd = &cobra.Command{
 	},
 }
 
-func printCo2Level(stationData netatmo2.StationData) {
+func printCo2Level(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Co2:", chalk.Green, stationData.Body.Devices[0].DashboardData.CO2, "ppm", chalk.Reset)
 

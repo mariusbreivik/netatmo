@@ -15,7 +15,7 @@ var statusCmd = &cobra.Command{
 	Long:    `Display a comprehensive overview of all your Netatmo weather station data in one view.`,
 	Example: "netatmo status",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		client, err := netatmo.NewClient()
+		client, err := getClient()
 		if err != nil {
 			return err
 		}

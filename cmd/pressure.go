@@ -19,8 +19,7 @@ import (
 	"fmt"
 	"math"
 
-	netatmo2 "github.com/mariusbreivik/netatmo/api/netatmo"
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
+	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
 )
@@ -32,7 +31,7 @@ var pressureCmd = &cobra.Command{
 	Long:    `read pressure data from netatmo station`,
 	Example: "netatmo pressure",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := netatmo.NewClient()
+		netatmoClient, err := getClient()
 
 		if err != nil {
 			return err
@@ -48,7 +47,7 @@ var pressureCmd = &cobra.Command{
 	},
 }
 
-func printPressureLevel(stationData netatmo2.StationData) {
+func printPressureLevel(stationData netatmo.StationData) {
 	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
 	fmt.Println("Pressure:", chalk.Green, math.Round(stationData.Body.Devices[0].DashboardData.AbsolutePressure/1000*760), "mm", chalk.Reset)
 
