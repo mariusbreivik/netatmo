@@ -19,47 +19,42 @@ import (
 	"fmt"
 
 	"github.com/mariusbreivik/netatmo/api/netatmo"
+	internalNetatmo "github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
-	"github.com/ttacon/chalk"
 )
 
 // noiseCmd represents the noise command
 var noiseCmd = &cobra.Command{
 	Use:     "noise",
-	Short:   "read noise data from netatmo station",
-	Long:    `read noise data from netatmo station`,
+	Short:   "Read noise data from Netatmo station",
+	Long:    `Read noise level data from your Netatmo indoor weather station module.`,
 	Example: "netatmo noise",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := getClient()
-
-		if len(args) > 0 {
-			fmt.Println(cmd.UsageString())
-		}
+		client, err := getClient()
 		if err != nil {
 			return err
 		}
 
-		printNoiseLevel(netatmoClient.GetStationData())
+		stationData, err := client.GetStationData()
+		if err != nil {
+			return err
+		}
+
+		if err := validateStationData(stationData); err != nil {
+			return err
+		}
+
+		printNoiseLevel(stationData)
 		return nil
 	},
 }
 
 func printNoiseLevel(stationData netatmo.StationData) {
-	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Noise level:", chalk.Green, stationData.Body.Devices[0].DashboardData.Noise, "dB", chalk.Reset)
-
+	device := stationData.Body.Devices[0]
+	fmt.Println("Station name:", device.StationName)
+	fmt.Println("Noise level:", internalNetatmo.FormatNoise(device.DashboardData.Noise))
 }
 
 func init() {
 	rootCmd.AddCommand(noiseCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// noiseCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// noiseCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

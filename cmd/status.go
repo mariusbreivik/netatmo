@@ -20,10 +20,13 @@ var statusCmd = &cobra.Command{
 			return err
 		}
 
-		stationData := client.GetStationData()
+		stationData, err := client.GetStationData()
+		if err != nil {
+			return err
+		}
 
-		if len(stationData.Body.Devices) == 0 {
-			return fmt.Errorf("no devices found")
+		if err := validateStationData(stationData); err != nil {
+			return err
 		}
 
 		device := stationData.Body.Devices[0]
