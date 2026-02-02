@@ -17,52 +17,45 @@ package cmd
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/mariusbreivik/netatmo/api/netatmo"
+	internalNetatmo "github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
-	"github.com/ttacon/chalk"
 )
 
-// pressure2Cmd represents the pressure command
+// pressureCmd represents the pressure command
 var pressureCmd = &cobra.Command{
 	Use:     "pressure",
-	Short:   "read pressure data from netatmo station",
-	Long:    `read pressure data from netatmo station`,
+	Short:   "Read pressure data from Netatmo station",
+	Long:    `Read atmospheric pressure data from your Netatmo weather station.`,
 	Example: "netatmo pressure",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := getClient()
-
+		client, err := getClient()
 		if err != nil {
 			return err
 		}
 
-		if len(args) > 0 {
-			fmt.Println(cmd.UsageString())
+		stationData, err := client.GetStationData()
+		if err != nil {
+			return err
 		}
 
-		printPressureLevel(netatmoClient.GetStationData())
+		if err := validateStationData(stationData); err != nil {
+			return err
+		}
 
+		printPressureLevel(stationData)
 		return nil
 	},
 }
 
 func printPressureLevel(stationData netatmo.StationData) {
-	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Pressure:", chalk.Green, math.Round(stationData.Body.Devices[0].DashboardData.AbsolutePressure/1000*760), "mm", chalk.Reset)
-
+	device := stationData.Body.Devices[0]
+	dashboard := device.DashboardData
+	fmt.Println("Station name:", device.StationName)
+	fmt.Printf("Pressure: %.1f hPa %s\n", dashboard.Pressure, internalNetatmo.FormatTrend(dashboard.PressureTrend))
 }
 
 func init() {
 	rootCmd.AddCommand(pressureCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// pressureCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// pressureCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

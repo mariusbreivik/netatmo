@@ -3,45 +3,61 @@ package netatmo
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"golang.org/x/oauth2"
 )
 
 const (
-	baseURL   = "https://api.netatmo.com/"
-	tokenURL  = baseURL + "oauth2/token"
-	deviceURL = baseURL + "api/getstationsdata"
+	baseURL        = "https://api.netatmo.com/"
+	tokenURL       = baseURL + "oauth2/token"
+	deviceURL      = baseURL + "api/getstationsdata"
+	defaultTimeout = 30 * time.Second
 )
 
 // Client use to make request to Netatmo API
 type Client struct {
-	oauth        *oauth2.Config
-	httpClient   *http.Client
-	httpResponse *http.Response
+	oauth      *oauth2.Config
+	httpClient *http.Client
+	ctx        context.Context
 }
 
 // NewClient creates a handle for authentication to Netatmo API using stored config
 func NewClient() (*Client, error) {
-	ctx := context.Background()
+	return NewClientWithContext(context.Background())
+}
+
+// NewClientWithContext creates a client with a custom context for timeout/cancellation
+func NewClientWithContext(ctx context.Context) (*Client, error) {
+	Debug("initializing Netatmo client")
 
 	// Load config
 	config, err := LoadConfig()
 	if err != nil {
+		Debug("failed to load config", "error", err)
 		return nil, err
 	}
 
 	// Validate credentials
 	if !config.HasCredentials() {
-		return nil, fmt.Errorf("credentials not configured. Please run 'netatmo configure' first")
+		return nil, NewAuthError(
+			"credentials not configured",
+			"Run 'netatmo configure' to set up your API credentials",
+			ErrNotConfigured,
+		)
 	}
 
 	// Validate tokens
 	if !config.HasTokens() {
-		return nil, fmt.Errorf("not authenticated. Please run 'netatmo login' first")
+		return nil, NewAuthError(
+			"not authenticated",
+			"Run 'netatmo login' to authenticate with Netatmo",
+			ErrNotAuthenticated,
+		)
 	}
 
 	oauthConfig := &oauth2.Config{
@@ -56,100 +72,128 @@ func NewClient() (*Client, error) {
 	// Load token
 	token, err := loadToken()
 	if err != nil {
-		return nil, fmt.Errorf("failed to load token: %w. Please run 'netatmo login' again", err)
+		Debug("failed to load token", "error", err)
+		return nil, NewAuthError(
+			"failed to load authentication token",
+			"Run 'netatmo login' to re-authenticate",
+			err,
+		)
 	}
 
 	if token == nil {
-		return nil, fmt.Errorf("not authenticated. Please run 'netatmo login' first")
+		return nil, NewAuthError(
+			"not authenticated",
+			"Run 'netatmo login' to authenticate with Netatmo",
+			ErrNotAuthenticated,
+		)
 	}
 
 	// Token is valid, use it directly
 	if token.Valid() {
+		Debug("using valid token")
 		return &Client{
 			oauth:      oauthConfig,
 			httpClient: oauthConfig.Client(ctx, token),
+			ctx:        ctx,
 		}, nil
 	}
 
 	// Token expired but we have a refresh token - try to refresh
 	if token.RefreshToken != "" {
+		Debug("token expired, attempting refresh")
 		tokenSource := oauthConfig.TokenSource(ctx, token)
 		newToken, err := tokenSource.Token()
 		if err != nil {
-			return nil, fmt.Errorf("token refresh failed: %w. Please run 'netatmo login' again", err)
+			Debug("token refresh failed", "error", err)
+			return nil, NewAuthError(
+				"token refresh failed",
+				"Run 'netatmo login' to re-authenticate",
+				err,
+			)
 		}
 
 		// Save the refreshed token
 		if saveErr := saveToken(newToken); saveErr != nil {
-			fmt.Printf("Warning: could not save refreshed token: %v\n", saveErr)
+			Warn("could not save refreshed token", "error", saveErr)
+		} else {
+			Debug("refreshed token saved successfully")
 		}
 
 		return &Client{
 			oauth:      oauthConfig,
 			httpClient: oauthConfig.Client(ctx, newToken),
+			ctx:        ctx,
 		}, nil
 	}
 
-	return nil, fmt.Errorf("token expired and no refresh token available. Please run 'netatmo login' again")
+	return nil, NewAuthError(
+		"token expired and no refresh token available",
+		"Run 'netatmo login' to re-authenticate",
+		ErrTokenExpired,
+	)
 }
 
-// do a generic HTTP request
+// doHTTP executes an HTTP request with timeout
 func (c *Client) doHTTP(req *http.Request) (*http.Response, error) {
+	// Add timeout context
+	ctx, cancel := context.WithTimeout(c.ctx, defaultTimeout)
+	defer cancel()
+	req = req.WithContext(ctx)
 
-	var err error
-	c.httpResponse, err = c.httpClient.Do(req)
+	Debug("executing HTTP request", "method", req.Method, "url", req.URL.String())
+
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, err
+		Debug("HTTP request failed", "error", err)
+		return nil, NewNetworkError("failed to connect to Netatmo API", err)
 	}
-	return c.httpResponse, nil
+
+	Debug("HTTP response received", "status", resp.StatusCode)
+	return resp, nil
 }
 
 // GetStationData returns data from netatmo api
-func (c *Client) GetStationData() netatmo.StationData {
+func (c *Client) GetStationData() (netatmo.StationData, error) {
+	Debug("fetching station data")
+
 	resp, err := c.doHTTPGet(deviceURL, url.Values{"app_type": {"app_station"}})
-
 	if err != nil {
-		fmt.Println(err)
+		return netatmo.StationData{}, err
 	}
-	stationData := processHTTPResponse(resp, err)
 
-	return stationData
+	return processHTTPResponse(resp)
 }
 
-// send http GET request
-func (c *Client) doHTTPGet(url string, data url.Values) (*http.Response, error) {
+// doHTTPGet sends an HTTP GET request
+func (c *Client) doHTTPGet(urlStr string, data url.Values) (*http.Response, error) {
 	if data != nil {
-		url = url + "?" + data.Encode()
+		urlStr = urlStr + "?" + data.Encode()
 	}
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest("GET", urlStr, nil)
 	if err != nil {
-		return nil, err
+		return nil, NewNetworkError("failed to create request", err)
 	}
 
 	return c.doHTTP(req)
 }
 
-// process HTTP response
-func processHTTPResponse(resp *http.Response, err error) netatmo.StationData {
+// processHTTPResponse parses the API response and returns station data
+func processHTTPResponse(resp *http.Response) (netatmo.StationData, error) {
 	defer resp.Body.Close()
-	if err != nil {
-		fmt.Printf("An error occured %s", err)
+
+	// Check HTTP status code
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		Debug("API error response", "status", resp.StatusCode, "body", string(body))
+		return netatmo.StationData{}, NewAPIError(resp.StatusCode, string(body), ErrAPIError)
 	}
 
-	// debug
-	//debug, _ := httputil.DumpResponse(resp, true)
-	//fmt.Printf("%s\n\n", debug)
-
-	// check http return code
-	if resp.StatusCode != 200 {
-		fmt.Printf("Bad HTTP return code %d", resp.StatusCode)
+	var stationData netatmo.StationData
+	if err := json.NewDecoder(resp.Body).Decode(&stationData); err != nil {
+		Debug("failed to decode response", "error", err)
+		return netatmo.StationData{}, NewAPIError(resp.StatusCode, "failed to parse API response", err)
 	}
 
-	var devices netatmo.StationData
-	err = json.NewDecoder(resp.Body).Decode(&devices)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return devices
+	Debug("station data received", "devices", len(stationData.Body.Devices))
+	return stationData, nil
 }

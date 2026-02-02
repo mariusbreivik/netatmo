@@ -19,29 +19,42 @@ import (
 	"fmt"
 
 	"github.com/mariusbreivik/netatmo/api/netatmo"
+	internalNetatmo "github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
-	"github.com/ttacon/chalk"
 )
 
 // humidityCmd represents the humidity command
 var humidityCmd = &cobra.Command{
 	Use:     "humidity",
-	Short:   "read humidity data from netatmo station",
-	Long:    `read humidity data from netatmo station`,
-	Example: "netatmo humidity",
+	Short:   "Read humidity data from Netatmo station",
+	Long:    `Read indoor or outdoor humidity data from your Netatmo weather station.`,
+	Example: "netatmo humidity --indoor\nnetatmo humidity --outdoor",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := getClient()
+		if !indoor && !outdoor {
+			return cmd.Help()
+		}
 
+		client, err := getClient()
 		if err != nil {
 			return err
 		}
 
+		stationData, err := client.GetStationData()
+		if err != nil {
+			return err
+		}
+
+		if err := validateStationData(stationData); err != nil {
+			return err
+		}
+
 		if indoor {
-			printIndoorHumidity(netatmoClient.GetStationData())
+			printIndoorHumidity(stationData)
 		} else if outdoor {
-			printOutdoorHumidity(netatmoClient.GetStationData())
-		} else {
-			fmt.Println(cmd.UsageString())
+			if len(stationData.Body.Devices[0].Modules) == 0 {
+				return fmt.Errorf("no outdoor module found")
+			}
+			printOutdoorHumidity(stationData)
 		}
 
 		return nil
@@ -49,29 +62,21 @@ var humidityCmd = &cobra.Command{
 }
 
 func printOutdoorHumidity(stationData netatmo.StationData) {
-	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Humidity outdoor:", chalk.Blue, stationData.Body.Devices[0].Modules[0].DashboardData.Humidity, chalk.Reset)
-
+	device := stationData.Body.Devices[0]
+	module := device.Modules[0]
+	fmt.Println("Station name:", device.StationName)
+	fmt.Println("Humidity outdoor:", internalNetatmo.FormatHumidity(module.DashboardData.Humidity))
 }
 
 func printIndoorHumidity(stationData netatmo.StationData) {
-	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Humidity indoor:", chalk.Red, stationData.Body.Devices[0].DashboardData.Humidity, chalk.Reset)
+	device := stationData.Body.Devices[0]
+	fmt.Println("Station name:", device.StationName)
+	fmt.Println("Humidity indoor:", internalNetatmo.FormatHumidity(device.DashboardData.Humidity))
 }
 
 func init() {
 	rootCmd.AddCommand(humidityCmd)
 
-	humidityCmd.Flags().BoolVarP(&indoor, "indoor", "i", false, "netatmo humidity -i|--indoor")
-	humidityCmd.Flags().BoolVarP(&outdoor, "outdoor", "o", false, "netatmo humidity -o|--outdoor")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// humidityCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// humidityCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	humidityCmd.Flags().BoolVarP(&indoor, "indoor", "i", false, "Show indoor humidity")
+	humidityCmd.Flags().BoolVarP(&outdoor, "outdoor", "o", false, "Show outdoor humidity")
 }

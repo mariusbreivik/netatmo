@@ -19,49 +19,42 @@ import (
 	"fmt"
 
 	"github.com/mariusbreivik/netatmo/api/netatmo"
+	internalNetatmo "github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
-	"github.com/ttacon/chalk"
 )
 
 // co2Cmd represents the co2 command
 var co2Cmd = &cobra.Command{
 	Use:     "co2",
-	Short:   "read co2 data from netatmo station",
-	Long:    `read co2 data from netatmo station`,
+	Short:   "Read CO2 data from Netatmo station",
+	Long:    `Read CO2 level data from your Netatmo indoor weather station module.`,
 	Example: "netatmo co2",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		netatmoClient, err := getClient()
-
+		client, err := getClient()
 		if err != nil {
 			return err
 		}
 
-		if len(args) > 0 {
-			fmt.Println(cmd.UsageString())
+		stationData, err := client.GetStationData()
+		if err != nil {
+			return err
 		}
 
-		printCo2Level(netatmoClient.GetStationData())
+		if err := validateStationData(stationData); err != nil {
+			return err
+		}
 
+		printCo2Level(stationData)
 		return nil
 	},
 }
 
 func printCo2Level(stationData netatmo.StationData) {
-	fmt.Println("Station name: ", stationData.Body.Devices[0].StationName)
-	fmt.Println("Co2:", chalk.Green, stationData.Body.Devices[0].DashboardData.CO2, "ppm", chalk.Reset)
-
+	device := stationData.Body.Devices[0]
+	fmt.Println("Station name:", device.StationName)
+	fmt.Println("CO2:", internalNetatmo.FormatCO2(device.DashboardData.CO2))
 }
 
 func init() {
 	rootCmd.AddCommand(co2Cmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// co2Cmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// co2Cmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
