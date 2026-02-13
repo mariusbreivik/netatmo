@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
 	"github.com/ttacon/chalk"
+
+	"github.com/mariusbreivik/netatmo/internal/netatmo"
 )
 
 // statusCmd represents the status command
