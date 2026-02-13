@@ -1,7 +1,4 @@
-# golangci-lint configuration
-# https://golangci-lint.run/usage/configuration/
-
-version: 2
+version: "2"
 
 run:
   timeout: 5m
@@ -20,23 +17,3 @@ linters:
     - misspell
     - bodyclose
     - noctx
-
-linters-settings:
-  errcheck:
-    check-type-assertions: true
-    check-blank: false
-
-  goimports:
-    local-prefixes: github.com/mariusbreivik/netatmo
-
-  misspell:
-    locale: US
-
-issues:
-  exclude-rules:
-    # Exclude some linters from running on tests files
-    - path: _test\.go
-      linters:
-        - errcheck
-
-
