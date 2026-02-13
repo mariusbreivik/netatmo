@@ -3,6 +3,7 @@
 > Your weather station in your terminal. Because sometimes you just need to know the CO2 level without opening an app.
 
 [![Build](https://github.com/mariusbreivik/netatmo/actions/workflows/build.yml/badge.svg)](https://github.com/mariusbreivik/netatmo/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/mariusbreivik/netatmo/branch/main/graph/badge.svg)](https://codecov.io/gh/mariusbreivik/netatmo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/mariusbreivik/netatmo)](https://goreportcard.com/report/github.com/mariusbreivik/netatmo)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -39,6 +40,18 @@
 
 ### Installation
 
+#### Quick Install (recommended)
+
+```shell
+go install github.com/mariusbreivik/netatmo@latest
+```
+
+#### Pre-built Binaries
+
+Download pre-built binaries for your platform from the [Releases page](https://github.com/mariusbreivik/netatmo/releases).
+
+#### Build from Source
+
 ```shell
 # Clone the repo
 git clone https://github.com/mariusbreivik/netatmo.git
@@ -46,9 +59,6 @@ cd netatmo
 
 # Build it
 go build -o netatmo .
-
-# (Optional) Install globally
-go install
 ```
 
 ### Configuration

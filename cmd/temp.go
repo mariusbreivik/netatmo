@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/mariusbreivik/netatmo/api/netatmo"
 	internalNetatmo "github.com/mariusbreivik/netatmo/internal/netatmo"
-	"github.com/spf13/cobra"
 )
 
 var indoor bool

@@ -6,8 +6,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mariusbreivik/netatmo/internal/netatmo"
 	"github.com/spf13/cobra"
+
+	"github.com/mariusbreivik/netatmo/internal/netatmo"
 )
 
 var accessToken string

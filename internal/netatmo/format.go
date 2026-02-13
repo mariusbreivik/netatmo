@@ -20,13 +20,6 @@ func color(c chalk.Color) string {
 	return ""
 }
 
-func style(s chalk.TextStyle) string {
-	if colorEnabled {
-		return s.String()
-	}
-	return ""
-}
-
 func reset() string {
 	if colorEnabled {
 		return chalk.Reset.String()
