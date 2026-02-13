@@ -64,12 +64,3 @@ func loadToken() (*oauth2.Token, error) {
 
 	return token, nil
 }
-
-// tokenExists checks if tokens exist in the config
-func tokenExists() bool {
-	config, err := LoadConfig()
-	if err != nil {
-		return false
-	}
-	return config.HasTokens()
-}

@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	netatmoAPI "github.com/mariusbreivik/netatmo/api/netatmo"
 	"github.com/mariusbreivik/netatmo/internal/netatmo"
-	"github.com/spf13/cobra"
 )
 
 // Global flags

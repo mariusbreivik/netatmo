@@ -8,8 +8,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/mariusbreivik/netatmo/api/netatmo"
 	"golang.org/x/oauth2"
+
+	"github.com/mariusbreivik/netatmo/api/netatmo"
 )
 
 const (
@@ -169,7 +170,7 @@ func (c *Client) doHTTPGet(urlStr string, data url.Values) (*http.Response, erro
 	if data != nil {
 		urlStr = urlStr + "?" + data.Encode()
 	}
-	req, err := http.NewRequest("GET", urlStr, nil)
+	req, err := http.NewRequestWithContext(c.ctx, "GET", urlStr, nil)
 	if err != nil {
 		return nil, NewNetworkError("failed to create request", err)
 	}

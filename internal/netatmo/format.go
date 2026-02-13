@@ -20,13 +20,6 @@ func color(c chalk.Color) string {
 	return ""
 }
 
-func style(s chalk.TextStyle) string {
-	if colorEnabled {
-		return s.String()
-	}
-	return ""
-}
-
 func reset() string {
 	if colorEnabled {
 		return chalk.Reset.String()
@@ -57,12 +50,12 @@ func FormatBattery(percent int) string {
 	}
 }
 
-func FormatRelativeTime(timestamp int) string {
+func FormatRelativeTime(timestamp int64) string {
 	if timestamp == 0 {
 		return "unknown"
 	}
 
-	t := time.Unix(int64(timestamp), 0)
+	t := time.Unix(timestamp, 0)
 	diff := time.Since(t)
 
 	switch {
