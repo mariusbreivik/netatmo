@@ -12,7 +12,6 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - goimports
     - misspell
     - bodyclose
     - noctx
