@@ -10,6 +10,11 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags:
+      - -s -w
+      - -X github.com/mariusbreivik/netatmo/cmd.Version={{.Version}}
+      - -X github.com/mariusbreivik/netatmo/cmd.Commit={{.ShortCommit}}
+      - -X github.com/mariusbreivik/netatmo/cmd.BuildDate={{.Date}}
 checksum:
   name_template: 'checksums.txt'
 snapshot:
