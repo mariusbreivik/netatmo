@@ -194,11 +194,14 @@ Available Commands:
   pressure    Read pressure data from netatmo station
   status      Display a full dashboard of your weather station
   temp        Read temperature data from netatmo station
+  version     Print version and build information
   wifi        Read wifi data from netatmo station
 
 Flags:
-  -d, --debug   Enable debug logging
-  -h, --help    Show help
+  -v, --verbose   Enable verbose/debug output
+      --json      Output in JSON format
+      --no-color  Disable colored output
+  -h, --help      Show help
 ```
 
 ---
@@ -212,14 +215,44 @@ Want to contribute? Awesome! 🎉
 git clone https://github.com/mariusbreivik/netatmo.git
 cd netatmo
 
-# Run tests
-go test ./...
+# Show available commands
+make help
 
-# Build
-go build -o netatmo .
+# Run tests
+make test
+
+# Run linter
+make lint
+
+# Build with version info
+make build
 
 # Run
 ./netatmo --help
+./netatmo version
+```
+
+### Version Info
+
+The `version` command shows build information:
+
+```shell
+$ netatmo version
+netatmo v0.2.51
+  Commit:     af203f8
+  Built:      2026-02-13T20:49:34Z
+  Go version: go1.25.6
+  OS/Arch:    darwin/arm64
+
+$ netatmo version --short
+v0.2.51
+
+$ netatmo version --json
+{
+  "version": "v0.2.51",
+  "commit": "af203f8",
+  ...
+}
 ```
 
 ---
