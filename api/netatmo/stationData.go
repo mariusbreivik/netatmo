@@ -1,5 +1,37 @@
 package netatmo
 
+// Module type constants for Netatmo devices
+const (
+	// ModuleTypeMain is the base station (indoor)
+	ModuleTypeMain = "NAMain"
+	// ModuleTypeOutdoor is the outdoor temperature/humidity module
+	ModuleTypeOutdoor = "NAModule1"
+	// ModuleTypeWind is the wind gauge module
+	ModuleTypeWind = "NAModule2"
+	// ModuleTypeRain is the rain gauge module
+	ModuleTypeRain = "NAModule3"
+	// ModuleTypeIndoor is an additional indoor module
+	ModuleTypeIndoor = "NAModule4"
+)
+
+// ModuleTypeDescription returns a human-readable description of a module type
+func ModuleTypeDescription(moduleType string) string {
+	switch moduleType {
+	case ModuleTypeMain:
+		return "Base Station"
+	case ModuleTypeOutdoor:
+		return "Outdoor"
+	case ModuleTypeWind:
+		return "Wind Gauge"
+	case ModuleTypeRain:
+		return "Rain Gauge"
+	case ModuleTypeIndoor:
+		return "Indoor"
+	default:
+		return "Unknown"
+	}
+}
+
 // StationData is a struct representation of the response from netatmo weather api
 type StationData struct {
 	Body       StationDataBody `json:"body"`
@@ -34,6 +66,37 @@ type Device struct {
 	HomeName        string          `json:"home_name"`
 	DashboardData   DeviceDashboard `json:"dashboard_data"`
 	Modules         []Module        `json:"modules"`
+}
+
+// GetModuleByType returns the first module matching the given type, or nil if not found
+func (d *Device) GetModuleByType(moduleType string) *Module {
+	for i := range d.Modules {
+		if d.Modules[i].Type == moduleType {
+			return &d.Modules[i]
+		}
+	}
+	return nil
+}
+
+// GetModulesByType returns all modules matching the given type
+func (d *Device) GetModulesByType(moduleType string) []Module {
+	var modules []Module
+	for _, m := range d.Modules {
+		if m.Type == moduleType {
+			modules = append(modules, m)
+		}
+	}
+	return modules
+}
+
+// GetModuleByName returns the module with the given name, or nil if not found
+func (d *Device) GetModuleByName(name string) *Module {
+	for i := range d.Modules {
+		if d.Modules[i].ModuleName == name {
+			return &d.Modules[i]
+		}
+	}
+	return nil
 }
 
 // Place represents the location information for a device

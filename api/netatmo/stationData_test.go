@@ -317,3 +317,170 @@ func TestModuleTypes(t *testing.T) {
 		})
 	}
 }
+
+func TestModuleTypeConstants(t *testing.T) {
+	// Verify module type constants have expected values
+	tests := []struct {
+		constant string
+		expected string
+	}{
+		{ModuleTypeMain, "NAMain"},
+		{ModuleTypeOutdoor, "NAModule1"},
+		{ModuleTypeWind, "NAModule2"},
+		{ModuleTypeRain, "NAModule3"},
+		{ModuleTypeIndoor, "NAModule4"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.expected, func(t *testing.T) {
+			if tt.constant != tt.expected {
+				t.Errorf("Constant = %q, want %q", tt.constant, tt.expected)
+			}
+		})
+	}
+}
+
+func TestModuleTypeDescription(t *testing.T) {
+	tests := []struct {
+		moduleType  string
+		description string
+	}{
+		{ModuleTypeMain, "Base Station"},
+		{ModuleTypeOutdoor, "Outdoor"},
+		{ModuleTypeWind, "Wind Gauge"},
+		{ModuleTypeRain, "Rain Gauge"},
+		{ModuleTypeIndoor, "Indoor"},
+		{"UnknownType", "Unknown"},
+		{"", "Unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.moduleType, func(t *testing.T) {
+			desc := ModuleTypeDescription(tt.moduleType)
+			if desc != tt.description {
+				t.Errorf("ModuleTypeDescription(%q) = %q, want %q", tt.moduleType, desc, tt.description)
+			}
+		})
+	}
+}
+
+func TestGetModuleByType(t *testing.T) {
+	device := Device{
+		Modules: []Module{
+			{ID: "1", Type: ModuleTypeOutdoor, ModuleName: "Outdoor"},
+			{ID: "2", Type: ModuleTypeWind, ModuleName: "Wind"},
+			{ID: "3", Type: ModuleTypeRain, ModuleName: "Rain"},
+			{ID: "4", Type: ModuleTypeIndoor, ModuleName: "Extra Indoor"},
+		},
+	}
+
+	t.Run("finds outdoor module", func(t *testing.T) {
+		module := device.GetModuleByType(ModuleTypeOutdoor)
+		if module == nil {
+			t.Fatal("Expected to find outdoor module")
+		}
+		if module.ID != "1" {
+			t.Errorf("Module ID = %q, want %q", module.ID, "1")
+		}
+		if module.ModuleName != "Outdoor" {
+			t.Errorf("ModuleName = %q, want %q", module.ModuleName, "Outdoor")
+		}
+	})
+
+	t.Run("finds wind module", func(t *testing.T) {
+		module := device.GetModuleByType(ModuleTypeWind)
+		if module == nil {
+			t.Fatal("Expected to find wind module")
+		}
+		if module.ID != "2" {
+			t.Errorf("Module ID = %q, want %q", module.ID, "2")
+		}
+	})
+
+	t.Run("returns nil for non-existent type", func(t *testing.T) {
+		module := device.GetModuleByType("NAModule99")
+		if module != nil {
+			t.Error("Expected nil for non-existent module type")
+		}
+	})
+
+	t.Run("returns nil for empty modules", func(t *testing.T) {
+		emptyDevice := Device{Modules: []Module{}}
+		module := emptyDevice.GetModuleByType(ModuleTypeOutdoor)
+		if module != nil {
+			t.Error("Expected nil for device with no modules")
+		}
+	})
+}
+
+func TestGetModulesByType(t *testing.T) {
+	device := Device{
+		Modules: []Module{
+			{ID: "1", Type: ModuleTypeIndoor, ModuleName: "Indoor 1"},
+			{ID: "2", Type: ModuleTypeOutdoor, ModuleName: "Outdoor"},
+			{ID: "3", Type: ModuleTypeIndoor, ModuleName: "Indoor 2"},
+			{ID: "4", Type: ModuleTypeIndoor, ModuleName: "Indoor 3"},
+		},
+	}
+
+	t.Run("finds all indoor modules", func(t *testing.T) {
+		modules := device.GetModulesByType(ModuleTypeIndoor)
+		if len(modules) != 3 {
+			t.Fatalf("Expected 3 indoor modules, got %d", len(modules))
+		}
+		if modules[0].ModuleName != "Indoor 1" {
+			t.Errorf("First module name = %q, want %q", modules[0].ModuleName, "Indoor 1")
+		}
+		if modules[2].ModuleName != "Indoor 3" {
+			t.Errorf("Third module name = %q, want %q", modules[2].ModuleName, "Indoor 3")
+		}
+	})
+
+	t.Run("finds single outdoor module", func(t *testing.T) {
+		modules := device.GetModulesByType(ModuleTypeOutdoor)
+		if len(modules) != 1 {
+			t.Fatalf("Expected 1 outdoor module, got %d", len(modules))
+		}
+	})
+
+	t.Run("returns empty slice for non-existent type", func(t *testing.T) {
+		modules := device.GetModulesByType(ModuleTypeWind)
+		if len(modules) != 0 {
+			t.Errorf("Expected 0 modules, got %d", len(modules))
+		}
+	})
+}
+
+func TestGetModuleByName(t *testing.T) {
+	device := Device{
+		Modules: []Module{
+			{ID: "1", Type: ModuleTypeOutdoor, ModuleName: "Garden"},
+			{ID: "2", Type: ModuleTypeIndoor, ModuleName: "Bedroom"},
+			{ID: "3", Type: ModuleTypeIndoor, ModuleName: "Kitchen"},
+		},
+	}
+
+	t.Run("finds module by name", func(t *testing.T) {
+		module := device.GetModuleByName("Bedroom")
+		if module == nil {
+			t.Fatal("Expected to find module")
+		}
+		if module.ID != "2" {
+			t.Errorf("Module ID = %q, want %q", module.ID, "2")
+		}
+	})
+
+	t.Run("returns nil for non-existent name", func(t *testing.T) {
+		module := device.GetModuleByName("Garage")
+		if module != nil {
+			t.Error("Expected nil for non-existent module name")
+		}
+	})
+
+	t.Run("name matching is case-sensitive", func(t *testing.T) {
+		module := device.GetModuleByName("bedroom")
+		if module != nil {
+			t.Error("Expected nil for case-mismatched name")
+		}
+	})
+}
