@@ -37,20 +37,21 @@ var humidityCmd = &cobra.Command{
 		if indoor {
 			printIndoorHumidity(stationData)
 		} else if outdoor {
-			if len(stationData.Body.Devices[0].Modules) == 0 {
+			module := stationData.Body.Devices[0].GetModuleByType(netatmo.ModuleTypeOutdoor)
+			if module == nil {
 				return fmt.Errorf("no outdoor module found")
 			}
-			printOutdoorHumidity(stationData)
+			printOutdoorHumidity(stationData, module)
 		}
 
 		return nil
 	},
 }
 
-func printOutdoorHumidity(stationData netatmo.StationData) {
+func printOutdoorHumidity(stationData netatmo.StationData, module *netatmo.Module) {
 	device := stationData.Body.Devices[0]
-	module := device.Modules[0]
 	fmt.Println("Station name:", device.StationName)
+	fmt.Printf("Module: %s (%s)\n", module.ModuleName, netatmo.ModuleTypeDescription(module.Type))
 	fmt.Println("Humidity outdoor:", internalNetatmo.FormatHumidity(module.DashboardData.Humidity))
 }
 
