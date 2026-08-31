@@ -40,20 +40,21 @@ var tempCmd = &cobra.Command{
 		if indoor {
 			printIndoorTemp(stationData)
 		} else if outdoor {
-			if len(stationData.Body.Devices[0].Modules) == 0 {
+			module := stationData.Body.Devices[0].GetModuleByType(netatmo.ModuleTypeOutdoor)
+			if module == nil {
 				return fmt.Errorf("no outdoor module found")
 			}
-			printOutdoorTemp(stationData)
+			printOutdoorTemp(stationData, module)
 		}
 
 		return nil
 	},
 }
 
-func printOutdoorTemp(stationData netatmo.StationData) {
+func printOutdoorTemp(stationData netatmo.StationData, module *netatmo.Module) {
 	device := stationData.Body.Devices[0]
-	module := device.Modules[0]
 	fmt.Println("Station name:", device.StationName)
+	fmt.Printf("Module: %s (%s)\n", module.ModuleName, netatmo.ModuleTypeDescription(module.Type))
 	fmt.Println("Temperature outdoor:", internalNetatmo.FormatTemperature(module.DashboardData.Temperature))
 }
 
